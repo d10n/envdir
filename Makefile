@@ -3,7 +3,11 @@ BUILD_DATE := $(shell date -u '+%Y-%m-%dT%H:%M:%S%z')
 VERSION := $(shell git describe --always --dirty --match 'v[0-9]*')
 COMMIT := $(shell git rev-parse HEAD)
 
-.PHONY: dist
+.PHONY: all
+all: test dist
+
+test:
+	$(GOCMD) test
 
 dist:
 	$(GOCMD) build -ldflags=" \
