@@ -6,6 +6,9 @@ COMMIT := $(shell git rev-parse HEAD)
 .PHONY: all
 all: test dist
 
+get-deps:
+	$(GOCMD) get ./...
+
 test:
 	$(GOCMD) test
 
