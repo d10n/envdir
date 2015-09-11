@@ -171,17 +171,11 @@ func stringHasNullCharacter(s string) bool {
 }
 
 func trimLastNewline(s string) string {
-	if len(s) >= 2 && s[len(s)-2:] == "\r\n" {
+	if strings.HasSuffix(s, "\r\n") {
 		return s[:len(s)-2]
 	}
-	if len(s) >= 1 {
-		lastRune := s[len(s)-1:]
-		if lastRune == "\n" {
-			return s[:len(s)-1]
-		}
-		if lastRune == "\r" {
-			return s[:len(s)-1]
-		}
+	if strings.HasSuffix(s, "\n") || strings.HasSuffix(s, "\r") {
+		return s[:len(s)-1]
 	}
 	return s
 }
