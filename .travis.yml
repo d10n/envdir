@@ -1,7 +1,16 @@
 language: go
-
 go:
-  - 1.5
-  - tip
-
-install: make get-deps
+- '1.8'
+- '1.9'
+- '1.10'
+before_deploy:
+  - tar cvfz envdir.linux-amd64.tar.gz envdir
+deploy:
+  provider: releases
+  api_key:
+    secure: <SECURE_TOKEN_IS_NEEDED>
+  file: envdir.linux-amd64.tar.gz
+  skip_cleanup: true
+  on:
+    repo: d10n/envdir
+    tags: true
