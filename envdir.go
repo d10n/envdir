@@ -2,14 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/docopt/docopt-go"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"syscall"
+
+	"github.com/docopt/docopt-go"
 )
 
 var buildDate = "development"
@@ -62,6 +65,8 @@ Interface:
 `
 
 const exitCodeUnsuccessful = 111
+
+var envNameRegex = regexp.MustCompile(`^[a-zA-Z_]+[a-zA-Z0-9_]*$`)
 
 type environment map[string]string
 
@@ -135,16 +140,45 @@ func getEnvironmentVariables(directory string, freshEnvironment bool) environmen
 		if fileInfo.IsDir() {
 			continue
 		}
+
 		fileName := fileInfo.Name()
-		if strings.ContainsRune(fileName, '=') {
-			fmt.Fprintf(os.Stderr, "Error: Filenames in the environment directory must not contain \"=\": %s\n", fileName)
-			os.Exit(exitCodeUnsuccessful)
+
+		// ensure the name
+		if !envNameRegex.MatchString(fileName) {
+			continue
 		}
+
+		// ensure the size
 		if fileInfo.Size() == 0 {
 			delete(environmentMap, fileName)
 			continue
 		}
+
 		fileLocation := path.Join(directory, fileName)
+
+		// if symlink, then try following
+		if fileInfo.Mode()&os.ModeSymlink != 0 {
+			fileLocation, err = os.Readlink(fileLocation)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error: Cannot read symlink: \"%s\"\n", fileLocation)
+				os.Exit(exitCodeUnsuccessful)
+			}
+
+			if !filepath.IsAbs(fileLocation) {
+				fileLocation = path.Join(directory, fileLocation)
+			}
+
+			fileInfo, err = os.Stat(fileLocation)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error: Failed to call os.Stat of %s\n", fileLocation)
+				os.Exit(exitCodeUnsuccessful)
+			}
+
+			if fileInfo.IsDir() {
+				continue
+			}
+		}
+
 		fileData, err := ioutil.ReadFile(fileLocation)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
