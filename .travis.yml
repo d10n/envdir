@@ -1,7 +1,16 @@
 language: go
-
 go:
-  - 1.5
-  - tip
-
-install: make get-deps
+- '1.8'
+- '1.9'
+- '1.10'
+before_deploy:
+  - tar cvfz envdir.linux-amd64.tar.gz envdir
+deploy:
+  provider: releases
+  api_key:
+    secure: EmhcKcRDchsqhwcuQBs+80SY6uBdjWgvxshJEfi7xsegAttJEBVW55rFvShWG+rDKweGyQLwvO8tCxbJPGGYI+dil0sfXqdUlJEg7I0E+ByqPS0elKDub4vd0T37OZhpqBtKyfX9rRlU5KyfQkoWcz+PIS9TQTB/70of11StmbFVGkPFaja+hrTxj4VNXfK9zttr7zpHFk/3tsPhaquFQlq/s1X+evWeicqfVyZDI1qMlpnOkeHohs/GHa0fBUL4pegdiWk1mY2vk3QL1Y9ChnGkzxX8vqBZqfYsAAiVWUF0mGxtQYOkxr1gy6KPCM8TJScPDqzJCON5wtps4k52oDclDvHKR/l7L/TUqjJcwnWLb+mlFQxFapQPfb2uTBkNPA1q+NC9XI+cGzAJnj4YHQFm13QKbGGzvdiC54gCSmE/PZ6Mi4ngTIDgpZpBcSCWpR+Usciw5VwrVj9qIt1Z2nkmXkhCAOPMpHwvnDcaufgc8LrZE7SWgg/Dl/VJmCNOhQ6RlzU1ZA00ZNH7BylTPLb+y2bhO6Sp54flXm/9SSDIh1Jcz5vZlP+83LZSciNt6IUgpis6yifxORSjy/PfkEE8qUTVGpBgh3JA6koT03OzZori+QBnSUSrcwtDFZX9rkGf+5Q3o2POKhnqXDWs+GaVkOwz3KslHvhgT6Q9yO0=
+  file: envdir.linux-amd64.tar.gz
+  skip_cleanup: true
+  on:
+    repo: d10n/envdir
+    tags: true

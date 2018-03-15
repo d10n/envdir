@@ -6,16 +6,13 @@ COMMIT := $(shell git rev-parse HEAD)
 .PHONY: all
 all: test dist
 
-get-deps:
-	$(GOCMD) get ./...
-
 test:
 	$(GOCMD) test
 
 dist:
-	$(GOCMD) build -ldflags=" \
+	$(GOCMD) build -a -installsuffix cgo -ldflags=" \
 		-X main.buildDate=$(BUILD_DATE) \
 		-X main.buildVersion=$(VERSION) \
 		-X main.buildCommit=$(COMMIT) \
-		-s \
+		-s -w \
 		"
